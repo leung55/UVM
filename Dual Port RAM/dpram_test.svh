@@ -6,14 +6,13 @@
 class dpram_test extends uvm_test;
     `uvm_component_utils(dpram_test)
     dpram_env dpramenv;
-    
     function new (string name, uvm_component parent);
         super.new(name, parent);
     endfunction
 
     function void build_phase(uvm_phase phase);
         super.build_phase(phase);
-        dpram_transaction::type_id::set_type_override(readwrite_dpram_transaction::get_type());
+        // dpram_transaction::type_id::set_type_override(readwrite_dpram_transaction::get_type());
         dpramenv = dpram_env::type_id::create(.name("dpramenv"), .parent(this));
     endfunction
 

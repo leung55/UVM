@@ -19,6 +19,9 @@ endclass
 class dpram_scoreboard extends uvm_scoreboard;
     uvm_analysis_export #(dpram_transaction) dpram_export;
     local dpram_sb_subscriber dpram_sb_sub;
+    dpram_reg_block dpram_reg_blk;
+    uvm_status_e status;
+    rand uvm_reg_data_logic_t data;
     `uvm_component_utils(dpram_scoreboard)
 
     function new (string name, uvm_component parent);
@@ -44,6 +47,22 @@ class dpram_scoreboard extends uvm_scoreboard;
         if(dpram_tx.write_en == 1 && dpram_tx.read_en == 1 && dpram_tx.r_addr == dpram_tx.w_addr) begin
             if(dpram_tx.datain == dpram_tx.dataout) begin
                 `uvm_info("dpram_scoreboard", {"datain matches dataout.\n", dpram_tx.sprint(p)}, UVM_LOW);
+            end else begin
+                `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+            end
+        end
+        else if(dpram_tx.write_en == 1) begin
+            dpram_reg_blk.mem.read(status, .offset(dpram_tx.w_addr), .value(data), .path(UVM_BACKDOOR), .parent(this));
+            if(dpram_tx.datain == data) begin
+                `uvm_info("dpram_scoreboard", {"datain matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
+            end else begin
+                `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+            end
+        end
+        else if(dpram_tx.read_en == 1) begin
+            dpram_reg_blk.mem.read(status, .offset(dpram_tx.r_addr), .value(data), .path(UVM_BACKDOOR), .parent(this));
+            if(dpram_tx.dataout == data) begin
+                `uvm_info("dpram_scoreboard", {"dataout matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
             end else begin
                 `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
             end
