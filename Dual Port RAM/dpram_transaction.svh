@@ -10,7 +10,7 @@ class dpram_transaction extends uvm_sequence_item;
     rand addr_t w_addr, r_addr;
     rand data_t datain;
     rand logic write_en, read_en;
-    data_t dataout;
+    data_t dataout, mem_data;
 
     constraint addr_en_con {
         w_addr          inside {[0:MAX_ADDR_VAL]};

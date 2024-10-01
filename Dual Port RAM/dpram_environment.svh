@@ -4,6 +4,7 @@
 `include "dpram_agent.svh"
 `include "dpram_subscriber.svh"
 `include "dpram_scoreboard.svh"
+`include "dpram_ral.svh"
 class dpram_env extends uvm_env;
     `uvm_component_utils(dpram_env)
 
@@ -23,13 +24,13 @@ class dpram_env extends uvm_env;
         dpram_sb = dpram_scoreboard::type_id::create(.name("dpram_sb"), .parent(this));
         dpram_reg_blk = dpram_reg_block::type_id::create(.name("dpram_reg_blk"), .parent(this));
         dpram_reg_blk.build();
+        uvm_config_db #(dpram_reg_block)::set(null, "uvm_test_top.*", "dpram_reg_blk", dpram_reg_blk);
     endfunction : build_phase
 
     function void connect_phase(uvm_phase phase);
         super.connect_phase(phase);
         dpram_agt.dpram_ap.connect(dpram_fc_sub.analysis_export);
         dpram_agt.dpram_ap.connect(dpram_sb.dpram_export);
-        dpram_sb.dpram_reg_blk = dpram_reg_blk;
     endfunction : connect_phase
 endclass
 `endif

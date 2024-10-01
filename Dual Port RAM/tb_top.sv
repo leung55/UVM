@@ -28,6 +28,6 @@ module tb_top;
       // Dump waves
     initial begin
         $dumpfile("dump.vcd");
-        $dumpvars(0, top);
+        $dumpvars(0, tb_top);
     end
 endmodule
