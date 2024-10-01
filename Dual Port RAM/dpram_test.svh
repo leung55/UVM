@@ -17,10 +17,10 @@ class dpram_test extends uvm_test;
     endfunction
 
     task run_phase(uvm_phase phase);
-        one_dpram_sequence dpram_seq;
+        multiple_dpram_sequence dpram_seq;
 
         phase.raise_objection(.obj(this));
-        dpram_seq = one_dpram_sequence::type_id::create(.name("dpram_seq"), .contxt(get_full_name()));
+        dpram_seq = multiple_dpram_sequence::type_id::create(.name("dpram_seq"), .contxt(get_full_name()));
         assert(dpram_seq.randomize());
         `uvm_info("dpram_test", { "\n", dpram_seq.sprint() }, UVM_LOW)
         dpram_seq.start(dpramenv.dpram_agt.dpram_seqr);

@@ -1,4 +1,14 @@
-I made a [lengthy post](https://www.reddit.com/r/FPGA/comments/1fsjpuf/uvm_register_abstraction_layer/) yesterday hoping for some input on the best way to implement a register abstraction layer to verify a Dual-Port RAM. Although I didn't get any replies, I still think I've made a decent amount of headway into an amateur-ish solution and wanted to make a blog-style post as a "lessons-learned" list for my future self and any others whom may stumble across similar struggles.
+**TL;DR - *Cracking Digital VLSI Verification Interview* 1st UVM project yap session - trials and tribulations**
+
+For some context, I've decided to take a crack at the UVM projects provided by the *Cracking Digital VLSI Verification Interview* book by Ramdas M and Robin Garg, so I can crack DV interviews.
+
+No matter how much I interview prep, the verification rabbit hole just keeps going, but I figure the fastest way to learn is by making UVM testbenches. These projects don't have much hand-holding though. The extent of help are basic DUTs and an APB testbench in the author's [github](https://github.com/VerificationExcellence).
+
+As a matter of fact, the author states, "*We are intentionally not providing a complete code database as solution as it defeats the purpose of reader putting that extra amount of effort in coding.*"
+
+I can't seem to find any other attempted solutions online, so I figured I might as well try it myself without an optimal solution to compare against. After all, real engineering rarely has a "correct" solution to compare against.
+
+I made a [lengthy post](https://www.reddit.com/r/FPGA/comments/1fsjpuf/uvm_register_abstraction_layer/) yesterday hoping for some input on the best way to implement a register abstraction layer to verify the first project - a dual-port RAM. Although I didn't get any replies, I still think I've made a decent amount of headway into an amateur-ish solution and wanted to make a blog-style post as a "lessons-learned" list for my future self and any others whom may stumble across similar struggles.
 
 Starting off with the [UVM for Candy Lovers RAL tutorial](https://cluelogic.com/2012/10/uvm-tutorial-for-candy-lovers-register-abstraction/) and [ChipVerify's article on backdoor access](https://www.chipverify.com/uvm/uvm-register-backdoor-access), I wanted to make user-defined classes of `uvm_reg` and `uvm_reg_block` with the idea that I would instantiate an array of 256 8-bit wide `dpram_reg` registers in my `dpram_reg_block` to mimic the 256 byte memory block in the DUT.
 
@@ -6,7 +16,7 @@ However, just as I was about to implement it using `uvm_reg_map`'s `add_reg()` f
 
 Moreover, reading the `uvm_mem` [documentation ](https://verificationacademy.com/verification-methodology-reference/uvm/docs_1.1b/html/files/reg/uvm_mem-svh.html#uvm_mem)seems to suggest that backdoor access is actually encouraged. Considering that this aligned with the intuition I had after a first-attempt UVM testbench for the DP RAM block, I decided to research how other testbenches use `uvm_mem` to model memory blocks.
 
-Of course, I struggled to find a good resource on how to use `uvm_mem` in what seems to be a reoccurring theme of limited reference code and poor explanations that I can't seem to shake on this journey to mastering UVM. ChatGPT has been a great tool in filling in gaps, but even it is prone to mistakes. In fact, I asked it (GPT-4o) how to instantiate a `uvm_mem` object in a `uvm_reg_block` and it botched it three times in direct contradiction to the documented function signatures.
+Of course, I struggled to find a good resource on how to use `uvm_mem` in what seems to be a reoccurring theme of limited reference code and poor explanations that I can't seem to escape on this journey to mastering UVM. ChatGPT has been a great tool in filling in gaps, but even it is prone to mistakes. In fact, I asked it (GPT-4o) how to instantiate a `uvm_mem` object in a `uvm_reg_block` and it botched it three times in direct contradiction to the documented function signatures.
 
 Eventually, I did stumble across a [forum post](https://verificationacademy.com/forums/t/back-door-access-for-uvm-mem/40973) that linked to a very useful but somewhat complex [example](https://www.edaplayground.com/x/6DJg) in EDA Playground. That playground served as reference code to instantiate a `uvm_mem` object inside my user-defined class `dpram_reg_block extends uvm_reg_block`. A few things I gleaned from the example:
 
@@ -55,7 +65,7 @@ For my second approach, I added to my uvm_sequence_item and monitor:
 
 1. Added a new variable to my uvm_sequence_item transaction: `mem_data`
 2. In the monitor `run_phase()` task, on top of grabbing the output data from the interface, it performs a backdoor read to get the data at the read or write address and puts it into the transaction's `mem_data`
-3. Remove the backdoor reads from the scoreboard and instead check against the `mem_data`
+3. Remove the backdoor reads from the scoreboard and instead check against the transaction's `mem_data`
 
 After all these changes, I was finally able to get my testbench to compile and run. It's gotta work... right?
 
@@ -69,7 +79,9 @@ Unsure of what to do, I tried to read carefully through the reference code in ca
 
 By chance, I eventually ended up changing the simulator after running out of ideas and noticed I got a completely different set of errors using different simulators. Different compilers for the same programming language might vary slightly in behavior in edge cases, but overall, if the source code for a program successfully compiles under one compiler, it should successfully compile under another compiler as long as they are all conforming to the same version of the language standard, e.g. gcc vs clang.
 
-Using different simulators in EDA Playground for the same source HDL/HVL code seems to be way less predictable. What might compile and run under Synopsys VCS might not compile under Cadence Xcelium or Siemens Questa and with completely different errors, which is exactly what happened in this case. Considering how problematic it is that I have to worry about having to change my testbench depending on which simulator is being used and that none of the free simulators support UVM, I'm shocked there isn't more of an effort to climb out of the hole this industry dug itself into by relying on closed-source proprietary tools. But that's a discussion for another day. In this case, the inconsistency between simulators was actually quite helpful in overcoming the blocker.
+Using different simulators in EDA Playground for the same source HDL/HVL code seems to be way less predictable. What might compile and run under Synopsys VCS might not compile under Cadence Xcelium or Siemens Questa and with completely different errors, which is exactly what happened in this case.
+
+Considering how problematic it is that I have to worry about having to change my testbench depending on which simulator is being used and that none of the free simulators support UVM, I'm shocked there isn't more of an effort to climb out of the hole this industry dug itself into by relying on closed-source proprietary tools. But that's a discussion for another day. In this case, the inconsistency between simulators was actually quite helpful in overcoming the blocker.
 
 In my testbench, I was using the VCS simulator, but the default simulator for the reference code is Xcelium. Knowing that the reference code should "work", I changed the simulator for the reference code to VCS and noticed the following error: `Error-[ACC-STR] Design debug db not found`
 
@@ -77,13 +89,17 @@ Googling the error led me to an [article](https://developer.arm.com/documentatio
 
 ```javascript
 Warning-[INTFDV] VCD dumping of interface/program/package
-testbench.sv, 33
+, 33
 Selective VCD dumping of interface 'dpram_if' is not supported. Selective
 VCD dumping for interfaces, packages and programs is not supported.
 Use full VCD dumping '$dumpvars(0)', or use VPD or FSDB dumping, recompile
-with '-debug_access'.
+with '-debug_access'.testbench.sv
 ```
 
-Turns out `-debug_access+r+w+nomemcbk -debug_region+cell` isn't necessary and simply adding the `-debug_access` is sufficient.
+Turns out `-debug_access+r+w+nomemcbk -debug_region+cell` aren't necessary and simply adding the `-debug_access` is sufficient.
 
-Now why did missing the `-debug_access` flag make VCS complain about the `UVM_HDL_MAX_WIDTH`? I have no idea, and I hope I'm not alone in the sentiment that issues like these make working with SystemVerilog and its simulators that much less pleasant.
+Now why did missing the `-debug_access` flag make VCS complain about the `UVM_HDL_MAX_WIDTH`? I have no idea, and I hope I'm not alone in the sentiment that issues like these make working with SystemVerilog and its simulators that much less appealing.
+
+I am glad I didn't have to implement the whole RAL to get the testbench to work as I mentioned in the last point of uncertainty I had in the previous post. That's something I want to save for a future attempt/testbench.
+
+Anyways, it's something. Not the best or most optimal, but I feel like I've learned a decent bit and am certainly open to constructive criticism. Feel free to check it out [here](https://www.edaplayground.com/x/SVxA)

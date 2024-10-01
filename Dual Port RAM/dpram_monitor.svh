@@ -34,12 +34,12 @@ class dpram_monitor extends uvm_monitor;
             @(posedge dpram_vif.clk);
             dpram_tx.dataout = dpram_vif.dataout;
             dpram_reg_blk.dpram_mem.read(status, .offset(uvm_reg_data_logic_t'((dpram_tx.write_en) ? dpram_tx.w_addr : dpram_tx.r_addr)), .value(dpram_tx.mem_data), .path(UVM_BACKDOOR));
-            `uvm_info("DPRAM_IF",
-            $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                        dpram_vif.datain, dpram_vif.r_addr, dpram_vif.w_addr, dpram_vif.write_en, dpram_vif.read_en, dpram_vif.dataout), UVM_MEDIUM)
-            `uvm_info("DPRAM_TX",
-            $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                        dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)          
+            // `uvm_info("DPRAM_IF",
+            // $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
+            //             dpram_vif.datain, dpram_vif.r_addr, dpram_vif.w_addr, dpram_vif.write_en, dpram_vif.read_en, dpram_vif.dataout), UVM_MEDIUM)
+            // `uvm_info("DPRAM_TX",
+            // $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
+            //             dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)          
             dpram_ap.write(dpram_tx);
         end
     endtask : run_phase

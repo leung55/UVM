@@ -22,16 +22,16 @@ module dpram(dpram_if.dut dpramif, input logic n_rst);
 
     always_ff @ (posedge dpramif.clk, negedge n_rst) begin
         if(~n_rst) begin
-            `uvm_info("DUT",
-                $sformatf("Reset activated  datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                          dpramif.datain, dpramif.r_addr, dpramif.w_addr, dpramif.write_en, dpramif.read_en, dpramif.dataout), UVM_MEDIUM)
+            // `uvm_info("DUT",
+            //     $sformatf("Reset activated  datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
+            //               dpramif.datain, dpramif.r_addr, dpramif.w_addr, dpramif.write_en, dpramif.read_en, dpramif.dataout), UVM_MEDIUM)
             dpramif.dataout <= '0;
             ram <= '0;
         end
         else begin
-            `uvm_info("DUT",
-                $sformatf("next clk edge datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                          dpramif.datain, dpramif.r_addr, dpramif.w_addr, dpramif.write_en, dpramif.read_en, dpramif.dataout), UVM_MEDIUM)
+            // `uvm_info("DUT",
+            //     $sformatf("next clk edge datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
+            //               dpramif.datain, dpramif.r_addr, dpramif.w_addr, dpramif.write_en, dpramif.read_en, dpramif.dataout), UVM_MEDIUM)
             dpramif.dataout <= nxt_out;
             ram <= nxt_ram;
         end

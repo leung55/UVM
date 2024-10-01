@@ -22,7 +22,24 @@ class one_dpram_sequence extends uvm_sequence #(dpram_transaction);
                     dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)
         finish_item(dpram_tx);
     endtask
+endclass
 
+class multiple_dpram_sequence extends uvm_sequence #(dpram_transaction);
+    int unsigned num_write_transactions = 300;
+    `uvm_object_utils(multiple_dpram_sequence)
+
+    function new (string name = "");
+        super.new(name);
+    endfunction
+
+    task body();
+        one_dpram_sequence dpram_seq;
+        repeat(num_write_transactions) begin
+            dpram_seq = one_dpram_sequence::type_id::create(.name("dpram_seq"), .contxt(get_full_name()));
+            assert(dpram_seq.randomize());
+            dpram_seq.start(.sequencer(m_sequencer), .parent_sequence(this));
+        end
+    endtask
 endclass
 
 class write_dpram_sequence extends uvm_sequence #(dpram_transaction);
