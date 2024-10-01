@@ -38,8 +38,8 @@ class dpram_reg_block extends uvm_reg_block;
 
     virtual function void build();
         dpram_mem = new("dpram_mem", BYTES_IN_RAM, BYTE);
-        // dpram_mem.add_hdl_path_slice("mem", 0, mem.get_n_bits());
-        dpram_mem.configure(this, .hdl_path("mem"));
+        dpram_mem.add_hdl_path_slice("ram", 0, dpram_mem.get_n_bits());
+        dpram_mem.configure(this);
     
         reg_map = create_map(
             .name("reg_map"),
