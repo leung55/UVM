@@ -48,18 +48,20 @@ class dpram_scoreboard extends uvm_scoreboard;
                 `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
             end
         end
-        else if(dpram_tx.write_en == 1) begin
-            if(dpram_tx.datain == dpram_tx.mem_data) begin
-                `uvm_info("dpram_scoreboard", {"datain matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
-            end else begin
-                `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+        else begin
+            if(dpram_tx.write_en == 1) begin
+                if(dpram_tx.datain == dpram_tx.mem_data) begin
+                    `uvm_info("dpram_scoreboard", {"datain matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
+                end else begin
+                    `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+                end
             end
-        end
-        else if(dpram_tx.read_en == 1) begin
-            if(dpram_tx.dataout == dpram_tx.mem_data) begin
-                `uvm_info("dpram_scoreboard", {"dataout matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
-            end else begin
-                `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+            if(dpram_tx.read_en == 1) begin
+                if(dpram_tx.dataout == dpram_tx.mem_data) begin
+                    `uvm_info("dpram_scoreboard", {"dataout matches RAM byte.\n", dpram_tx.sprint(p)}, UVM_LOW);
+                end else begin
+                    `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
+                end
             end
         end
     endfunction
