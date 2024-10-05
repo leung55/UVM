@@ -39,10 +39,10 @@ class dpram_scoreboard extends uvm_scoreboard;
     virtual function void check_output(dpram_transaction dpram_tx);
         uvm_table_printer p = new;
         `uvm_info("DPRAM_TX",
-                $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                          dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)
+                $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h, mem_data: %h",
+                          dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout, dpram_tx.mem_data), UVM_MEDIUM)
         if(dpram_tx.write_en == 1 && dpram_tx.read_en == 1 && dpram_tx.r_addr == dpram_tx.w_addr) begin
-            if(dpram_tx.datain == dpram_tx.dataout) begin
+            if(dpram_tx.datain == dpram_tx.dataout && dpram_tx.datain == dpram_tx.mem_data) begin
                 `uvm_info("dpram_scoreboard", {"datain matches dataout.\n", dpram_tx.sprint(p)}, UVM_LOW);
             end else begin
                 `uvm_error("dpram_scoreboard", {"failed testcase.\n", dpram_tx.sprint(p)});
