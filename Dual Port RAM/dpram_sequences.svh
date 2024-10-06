@@ -17,9 +17,9 @@ class one_dpram_sequence extends uvm_sequence #(dpram_transaction);
         dpram_tx = dpram_transaction::type_id::create(.name("dpram_tx"), .contxt(get_full_name()));
         start_item(dpram_tx);
         assert(dpram_tx.randomize());
-        `uvm_info("DPRAM_TX",
-        $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
-                    dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)
+        // `uvm_info("DPRAM_TX",
+        // $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
+        //             dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)
         finish_item(dpram_tx);
     endtask
 endclass

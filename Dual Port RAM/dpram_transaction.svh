@@ -2,15 +2,16 @@
 `ifndef DPRAM_TRANSACTION_SVH
 `define DPRAM_TRANSACTION_SVH
 `include "dpram_types_pkg.svh"
+`include "uvm_macros.svh"
 import dpram_types_pkg::*;
-
+import uvm_pkg::*;
 class dpram_transaction extends uvm_sequence_item;
     `uvm_object_utils(dpram_transaction)
 
     rand addr_t w_addr, r_addr;
     rand data_t datain;
     rand logic write_en, read_en;
-    data_t dataout, mem_data;
+    data_t dataout, r_mem_data, w_mem_data;
 
     constraint addr_en_con {
         w_addr          inside {[0:MAX_ADDR_VAL]};
