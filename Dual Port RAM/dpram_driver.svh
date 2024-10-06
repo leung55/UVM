@@ -15,7 +15,7 @@ class dpram_driver extends uvm_driver#(dpram_transaction);
         assert(uvm_config_db #(virtual dpram_if)::get(.cntxt(this), .inst_name(""), .field_name("dpram_if"), .value(dpram_vif)));
     endfunction
 
-    task run_phase(uvm_phase phase);
+    task main_phase(uvm_phase phase);
         dpram_transaction dpram_tx;
         forever begin
             @(posedge dpram_vif.clk);
@@ -28,6 +28,6 @@ class dpram_driver extends uvm_driver#(dpram_transaction);
             @(posedge dpram_vif.clk);
             seq_item_port.item_done();
         end
-    endtask : run_phase
+    endtask : main_phase
 endclass : dpram_driver
 `endif

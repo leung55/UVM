@@ -42,6 +42,26 @@ class multiple_dpram_sequence extends uvm_sequence #(dpram_transaction);
     endtask
 endclass
 
+class randomize_dpram_sequence extends uvm_sequence #(dpram_transaction);
+    `uvm_object_utils(randomize_dpram_sequence)
+
+    function new(string name="");
+        super.new(name);
+    endfunction
+
+    task body();
+        dpram_transaction write_tx;
+        addr_t i = 0;
+        repeat(BYTES_IN_RAM) begin
+            write_tx = write_dpram_transaction::type_id::create(.name("write_tx"), .contxt(get_full_name()));
+            start_item(write_tx);
+            assert(write_tx.randomize() with {write_tx.w_addr == i;});
+            finish_item(write_tx);
+            i++;
+        end
+    endtask
+endclass
+
 class write_dpram_sequence extends uvm_sequence #(dpram_transaction);
     `uvm_object_utils(write_dpram_sequence)
     

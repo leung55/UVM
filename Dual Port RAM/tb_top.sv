@@ -3,18 +3,26 @@
 module tb_top;
     import uvm_pkg::*;
     bit clk, n_rst;
-
+    
     dpram_if dpramif(clk);
     dpram dpram0(dpramif.dut, n_rst);
 
     initial begin
         clk = 0;
-        forever #5 clk = ~clk;
+        forever #(CLK_PERIOD / 2) clk = ~clk;
     end
 
     initial begin
+        uvm_event assert_rst, release_rst;
+        uvm_event_pool event_pool = uvm_event_pool::get_global_pool();
+        assert_rst = event_pool.get("reset_after_scramble");
+        release_rst = event_pool.get("release_reset");
         n_rst = 0;
         #1 n_rst = 1;
+        assert_rst.wait_trigger;
+        n_rst = 0;
+        #(CLK_PERIOD) n_rst = 1;
+        release_rst.trigger;
     end
 
     initial begin

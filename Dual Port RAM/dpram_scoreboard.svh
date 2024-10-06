@@ -38,29 +38,29 @@ class dpram_scoreboard extends uvm_scoreboard;
 
     virtual function void check_output(dpram_transaction dpram_tx);
         uvm_table_printer p = new;
-        `uvm_info("DPRAM_TX",
-                $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h, r_mem_data: %h, w_mem_data: %h",
-                          dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout, dpram_tx.r_mem_data, dpram_tx.r_mem_data), UVM_MEDIUM)
+        // `uvm_info("DPRAM_TX",
+                // $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h, r_mem_data: %h, w_mem_data: %h",
+                //           dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout, dpram_tx.r_mem_data, dpram_tx.r_mem_data), UVM_MEDIUM)
         if(dpram_tx.write_en == 1 && dpram_tx.read_en == 1 && dpram_tx.r_addr == dpram_tx.w_addr) begin
             if(dpram_tx.datain == dpram_tx.dataout && dpram_tx.datain == dpram_tx.r_mem_data && dpram_tx.r_mem_data == dpram_tx.w_mem_data) begin
-                `uvm_info("dpram_scoreboard", {"datain matches dataout.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
+                // `uvm_info("dpram_scoreboard", {"datain matches dataout.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
             end else begin
-                `uvm_error("dpram_scoreboard", {"datain doen't match dataout.\n"/* , dpram_tx.sprint(p) */});
+                // `uvm_error("dpram_scoreboard", {"datain doen't match dataout.\n"/* , dpram_tx.sprint(p) */});
             end
         end
         else begin
             if(dpram_tx.write_en == 1) begin
                 if(dpram_tx.datain == dpram_tx.w_mem_data) begin
-                    `uvm_info("dpram_scoreboard", {"datain matches RAM byte.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
+                    // `uvm_info("dpram_scoreboard", {"datain matches RAM byte.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
                 end else begin
-                    `uvm_error("dpram_scoreboard", {"datain doesn't match RAM byte.\n"/* , dpram_tx.sprint(p) */});
+                    // `uvm_error("dpram_scoreboard", {"datain doesn't match RAM byte.\n"/* , dpram_tx.sprint(p) */});
                 end
             end
             if(dpram_tx.read_en == 1) begin
                 if(dpram_tx.dataout == dpram_tx.r_mem_data) begin
-                    `uvm_info("dpram_scoreboard", {"dataout matches RAM byte.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
+                    // `uvm_info("dpram_scoreboard", {"dataout matches RAM byte.\n"/* , dpram_tx.sprint(p) */}, UVM_LOW);
                 end else begin
-                    `uvm_error("dpram_scoreboard", {"dataout doesn't match RAM byte.\n"/* , dpram_tx.sprint(p) */});
+                    // `uvm_error("dpram_scoreboard", {"dataout doesn't match RAM byte.\n"/* , dpram_tx.sprint(p) */});
                 end
             end
         end

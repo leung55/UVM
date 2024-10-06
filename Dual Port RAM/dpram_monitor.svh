@@ -20,9 +20,8 @@ class dpram_monitor extends uvm_monitor;
         assert(uvm_config_db #(dpram_reg_block)::get(null, "uvm_test_top.*", "dpram_reg_blk", dpram_reg_blk));
     endfunction
 
-    task run_phase(uvm_phase phase);
+    task main_phase(uvm_phase phase);
         uvm_status_e status;
-        uvm_reg_data_logic_t data;
         forever begin
             dpram_transaction dpram_tx;
             dpram_tx = dpram_transaction::type_id::create(.name("dpram_tx"), .contxt(get_full_name()));
@@ -35,9 +34,11 @@ class dpram_monitor extends uvm_monitor;
             dpram_tx.dataout = dpram_vif.dataout;
             if(dpram_tx.read_en) begin
                 dpram_reg_blk.dpram_mem.read(status, .offset(uvm_reg_data_logic_t'(dpram_tx.r_addr)), .value(dpram_tx.r_mem_data), .path(UVM_BACKDOOR));
+                assert(status == UVM_IS_OK);
             end
             if(dpram_tx.write_en) begin
                 dpram_reg_blk.dpram_mem.read(status, .offset(uvm_reg_data_logic_t'(dpram_tx.w_addr)), .value(dpram_tx.w_mem_data), .path(UVM_BACKDOOR));
+                assert(status == UVM_IS_OK);
             end
             // `uvm_info("DPRAM_IF",
             // $sformatf("datain: %h, r_addr: %h, w_addr: %h, wen: %d, ren: %d, dataout: %h",
@@ -47,6 +48,6 @@ class dpram_monitor extends uvm_monitor;
             //             dpram_tx.datain, dpram_tx.r_addr, dpram_tx.w_addr, dpram_tx.write_en, dpram_tx.read_en, dpram_tx.dataout), UVM_MEDIUM)          
             dpram_ap.write(dpram_tx);
         end
-    endtask : run_phase
+    endtask : main_phase
 endclass : dpram_monitor
 `endif
